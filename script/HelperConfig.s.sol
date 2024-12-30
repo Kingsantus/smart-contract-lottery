@@ -11,12 +11,13 @@ abstract contract CodeConstants {
     // LINK / ETH price
     int256 public MOCK_WEI_PER_UNIT_LINK = 4e15;
 
-    uint256 public constant ETH_SEPOLIA_CHAIN_ID =1115511;
+    uint256 public constant ETH_SEPOLIA_CHAIN_ID = 1115511;
     uint256 public constant LOCAL_CHAIN_ID = 31337;
 }
 
 contract HelperConfig is CodeConstants, Script {
     error HelperConfig__InvalidChainId();
+
     struct NetworkConfig {
         uint256 entranceFee;
         uint256 interval;
@@ -25,15 +26,16 @@ contract HelperConfig is CodeConstants, Script {
         uint256 subscriptionId;
         uint32 callbackGasLimit;
     }
+
     NetworkConfig public localNetworkConfig;
-    mapping (uint256 chainId => NetworkConfig) public networkConfigs;
+    mapping(uint256 chainId => NetworkConfig) public networkConfigs;
 
     constructor() {
         networkConfigs[ETH_SEPOLIA_CHAIN_ID] = getSepoliaEthConfig();
     }
 
     function getConfigByChainId(uint256 chainId) public returns (NetworkConfig memory) {
-        if(networkConfigs[chainId].vrfCoordinator != address(0)){
+        if (networkConfigs[chainId].vrfCoordinator != address(0)) {
             return networkConfigs[chainId];
         } else if (chainId == LOCAL_CHAIN_ID) {
             return getOrCreateAnvilEthConfig();
@@ -42,7 +44,7 @@ contract HelperConfig is CodeConstants, Script {
         }
     }
 
-    function getConfig() public returns(NetworkConfig memory) {
+    function getConfig() public returns (NetworkConfig memory) {
         return getConfigByChainId(block.chainid);
     }
 
@@ -65,7 +67,8 @@ contract HelperConfig is CodeConstants, Script {
 
         // Deploy mocks and such
         vm.startBroadcast();
-        VRFCoordinatorV2_5Mock vrfCoordinatorMock = new VRFCoordinatorV2_5Mock(MOCK_BASE_FEE, MOCK_GAS_PRICE_LINK, MOCK_WEI_PER_UNIT_LINK);
+        VRFCoordinatorV2_5Mock vrfCoordinatorMock =
+            new VRFCoordinatorV2_5Mock(MOCK_BASE_FEE, MOCK_GAS_PRICE_LINK, MOCK_WEI_PER_UNIT_LINK);
         vm.stopBroadcast();
 
         localNetworkConfig = NetworkConfig({

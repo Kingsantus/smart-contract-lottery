@@ -14,6 +14,10 @@ contract DeployRaffle is Script {
         // sepolia -> get sepolia config
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
 
+        if (config.subscriptionId == 0) {
+            
+        }
+
         vm.startBroadcast();
         Raffle raffle = new Raffle(
             config.entranceFee,
@@ -24,6 +28,6 @@ contract DeployRaffle is Script {
             config.callbackGasLimit
         );
         vm.stopBroadcast();
-        return(raffle, helperConfig);
+        return (raffle, helperConfig);
     }
 }
