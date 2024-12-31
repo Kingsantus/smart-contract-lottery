@@ -69,6 +69,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
      */
     event RaffleEntered(address indexed player);
     event WinnerPicked(address indexed winner);
+    event RequestedRaffleWinner(uint256 indexed requestId);
 
     constructor(
         uint256 entranceFee,
@@ -141,9 +142,6 @@ contract Raffle is VRFConsumerBaseV2Plus {
         if (!upkeepNeeded) {
             revert Raffle__UpKeepNotNeeded(address(this).balance, s_players.length, uint256(s_raffleState));
         }
-        // if ((block.timestamp - s_lastTimeStamp) < i_interval) {
-        //     revert();
-        // }
         s_raffleState = RaffleState.CALCULATING;
         // Get our random number from chainlink VRF 2.5
         // 1. Request RNG
@@ -159,10 +157,8 @@ contract Raffle is VRFConsumerBaseV2Plus {
                 VRFV2PlusClient.ExtraArgsV1({nativePayment: false})
             )
         });
-        /**
-         * uint256 requestId =
-         */
-        s_vrfCoordinator.requestRandomWords(request);
+        uint256 requestId = s_vrfCoordinator.requestRandomWords(request);
+        emit RequestedRaffleWinner(requestId);
     }
 
     function fulfillRandomWords(uint256, /*requestId*/ uint256[] calldata randomWords) internal override {
